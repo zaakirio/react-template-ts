@@ -4,7 +4,7 @@ This is a simplified React starter templateconfigured using [Vite](https://vitej
 
 It has minimal dependencies and configuration to allow for easy installation and to allow the candidate to make their own decisions about styling, external libraries and other tooling.
 
-You are free to make changes to the template but please be aware that those reviewing your work will need to be able tp install and run it locally without difficulty.
+You are free to make changes to the template but please be aware that those reviewing your work will need to be able to install and run it locally without difficulty.
 
 ---
 
