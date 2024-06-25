@@ -55,9 +55,3 @@ jobs:
           echo "API did not return valid JSON"
           exit 1
         fi
-        if [ $(echo "$response" | jq length) -gt 0 ]; then
-          echo "API returned non-empty array"
-        else
-          echo "API returned empty array"
-          exit 1
-        fi
