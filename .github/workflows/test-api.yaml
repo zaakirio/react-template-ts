@@ -1,46 +1,47 @@
+---
 name: API Test
-
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
-
+    branches:
+      - main
 jobs:
   test-api:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+      - name: Install dependencies
+        run: npm ci
+      - name: Run API test
+        env:
+          VITE_USERNAME: ${{ secrets.VITE_USERNAME }}
+        run: >
+          response=$(curl -s -o /dev/null -w "%{http_code}" -H "Content-Type:
+          application/json" -H "Username: $VITE_USERNAME"
+          https://expenses-backend-mu.vercel.app/expenses)
 
-    - name: Use Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
+          if [ $response -eq 200 ]; then
+            echo "API test successful"
+          else
+            echo "API test failed with status code $response"
+            exit 1
+          fi
+      - name: Check API response
+        env:
+          VITE_USERNAME: ${{ secrets.VITE_USERNAME }}
+        run: >
+          response=$(curl -s -H "Content-Type: application/json" -H "Username:
+          $VITE_USERNAME" https://expenses-backend-mu.vercel.app/expenses)
 
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Run API test
-      env:
-        VITE_USERNAME: ${{ secrets.VITE_USERNAME }}
-      run: |
-        response=$(curl -s -o /dev/null -w "%{http_code}" -H "Content-Type: application/json" -H "Username: $VITE_USERNAME" https://expenses-backend-mu.vercel.app/expenses)
-        if [ $response -eq 200 ]; then
-          echo "API test successful"
-        else
-          echo "API test failed with status code $response"
-          exit 1
-        fi
-
-    - name: Check API response
-      env:
-        VITE_USERNAME: ${{ secrets.VITE_USERNAME }}
-      run: |
-        response=$(curl -s -H "Content-Type: application/json" -H "Username: $VITE_USERNAME" https://expenses-backend-mu.vercel.app/expenses)
-        if echo "$response" | jq empty; then
-          echo "API returned valid JSON"
-        else
-          echo "API did not return valid JSON"
-          exit 1
-        fi
+          if echo "$response" | jq empty; then
+            echo "API returned valid JSON"
+          else
+            echo "API did not return valid JSON"
+            exit 1
+          fi
